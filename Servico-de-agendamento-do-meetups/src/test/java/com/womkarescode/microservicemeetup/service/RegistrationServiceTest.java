@@ -110,17 +110,17 @@ public class RegistrationServiceTest {
 
         Mockito.verify(repository,Mockito.times(1)).delete(registration);
     }
-
     @Test
     @DisplayName("Should update an registration")
-    public void testUpdateRegistration(){
+    public void testUpdateRegistration() {
+
         Long id = 11L;
         Registration updatingRegistration = Registration.builder().id(11L).build();
 
-        Registration updatedRegistration =  createValidRegistration();
+        Registration updatedRegistration = createValidRegistration();
         updatedRegistration.setId(id);
 
-        Mockito.when(repository.save(updatingRegistration)).thenReturn(updatingRegistration);
+        Mockito.when(repository.save(updatingRegistration)).thenReturn(updatedRegistration);
         Registration registration = service.update(updatingRegistration);
 
         assertThat(registration.getId()).isEqualTo(updatedRegistration.getId());
