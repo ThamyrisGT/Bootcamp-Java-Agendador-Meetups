@@ -140,6 +140,149 @@ public class RegistrationControllerTest {
                 .andExpect(jsonPath("errors[0]").value("Registration already exists"));
     }
 
+    @Test
+    @DisplayName("Should return NOT FOUND when the registration doesn't exists")
+    public void testRegistrationNotFound() throws Exception {
+
+        BDDMockito.given(registrationService.getRegistrationById(anyLong())).willReturn(Optional.empty());
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get(REGISTRATION_API.concat("/" + 1))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Should delete the registration")
+    public void testDeleteRegistration() throws Exception {
+
+        BDDMockito.given(registrationService
+                        .getRegistrationById(anyLong()))
+                .willReturn(Optional.of(Registration.builder().id(11L).build()));
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .delete(REGISTRATION_API.concat("/" + 1))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("Should return resource not found when no registration is found to delete")
+    public void testDeleteNonExistentRegistration() throws Exception {
+
+        BDDMockito.given(registrationService
+                .getRegistrationById(anyLong())).willReturn(Optional.empty());
+
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .delete(REGISTRATION_API.concat("/" + 1))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Should update registration")
+    public void testUpdateRegistration() throws Exception {
+
+        Long id = 11L;
+        String json = new ObjectMapper().writeValueAsString(createNewRegistration());
+
+        Registration updatingRegistration =
+                Registration.builder()
+                        .id(id)
+                        .name("Thamyris")
+                        .dateOfRegistration("10/10/2021")
+                        .registration("001")
+                        .build();
+
+        BDDMockito.given(registrationService.getRegistrationById(anyLong()))
+                .willReturn(Optional.of(updatingRegistration));
+
+        Registration updatedRegistration =
+                Registration.builder()
+                        .id(id)
+                        .name("Thamyris")
+                        .dateOfRegistration("10/10/2021")
+                        .registration("001")
+                        .build();
+
+        BDDMockito.given(registrationService
+                        .update(updatingRegistration))
+                .willReturn(updatedRegistration);
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .put(REGISTRATION_API.concat("/" + 1))
+                .contentType(json)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(id))
+                .andExpect(jsonPath("name").value(createNewRegistration().getName()))
+                .andExpect(jsonPath("dateOfRegistration").value(createNewRegistration().getDateOfRegistration()))
+                .andExpect(jsonPath("registration").value("001"));
+    }
+
+    @Test
+    @DisplayName("Should return 404 when try to update an registration no existent")
+    public void testUpdateNonExistentRegistration() throws Exception {
+
+        String json = new ObjectMapper().writeValueAsString(createNewRegistration());
+        BDDMockito.given(registrationService.getRegistrationById(anyLong()))
+                .willReturn(Optional.empty());
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .put(REGISTRATION_API.concat("/" + 1))
+                .contentType(json)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Should filter registration")
+    public void testFindRegistration() throws Exception {
+
+        Long id = 11L;
+
+        Registration registration = Registration.builder()
+                .id(id)
+                .name(createNewRegistration().getName())
+                .dateOfRegistration(createNewRegistration().getDateOfRegistration())
+                .registration(createNewRegistration().getRegistration()).build();
+
+        BDDMockito.given(registrationService.find(Mockito.any(Registration.class), Mockito.any(Pageable.class)))
+                .willReturn(new PageImpl<Registration>(Arrays.asList(registration),
+                        PageRequest.of(0,100), 1));
+
+
+        String queryString = String.format("?name=%s&dateOfRegistration=%s&page=0&size=100",
+                registration.getRegistration(), registration.getDateOfRegistration());
+
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .put(REGISTRATION_API.concat(queryString))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc
+                .perform(requestBuilder)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content", Matchers.hasSize(1)))
+                .andExpect(jsonPath("totalElements"). value(1))
+                .andExpect(jsonPath("pageable.pageSize"). value(100))
+                .andExpect(jsonPath("pageable.pageNumber"). value(0));
+
+    }
+
     private RegistrationDTO createNewRegistration() {
         return  RegistrationDTO.builder()
                 .id(101l).name("Thamyris")

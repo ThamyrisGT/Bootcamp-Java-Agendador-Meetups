@@ -44,4 +44,24 @@ public class RegistrationController {
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteByRegistrationId(@PathVariable Long id) {
+        Registration registration = service.getRegistrationById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        service.delete(registration);
+    }
+
+    @PutMapping("{id}")
+    public RegistrationDTO update(@PathVariable Long id, RegistrationDTO registrationDTO) {
+
+        return service.getRegistrationById(id).map(registration -> {
+            registration.setName(registrationDTO.getName());
+            registration.setDateOfRegistration(registrationDTO.getDateOfRegistration());
+            registration = service.update(registration);
+
+            return modelMapper.map(registration, RegistrationDTO.class);
+        }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+    }
+
 }

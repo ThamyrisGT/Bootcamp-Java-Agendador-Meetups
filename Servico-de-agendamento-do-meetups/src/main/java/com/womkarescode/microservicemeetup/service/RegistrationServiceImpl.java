@@ -3,10 +3,7 @@ package com.womkarescode.microservicemeetup.service;
 import com.womkarescode.microservicemeetup.exception.BusinessException;
 import com.womkarescode.microservicemeetup.model.Registration;
 import com.womkarescode.microservicemeetup.repository.RegistrationRepository;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.*;
 
 import java.util.Optional;
 
@@ -48,7 +45,7 @@ public class RegistrationServiceImpl implements  RegistrationService{
     }
 
     @Override
-    public Page<Registration> find(Registration filter, PageRequest pageRequest) {
+    public Page<Registration> find(Registration filter, Pageable pageRequest) {
         Example<Registration> example = Example.of(filter,
                 ExampleMatcher.matching()
                         .withIgnoreCase()
