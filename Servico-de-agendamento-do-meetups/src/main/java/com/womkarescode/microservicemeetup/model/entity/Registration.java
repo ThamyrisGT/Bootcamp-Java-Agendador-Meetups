@@ -1,33 +1,32 @@
-package com.womkarescode.microservicemeetup.model;
+package com.womkarescode.microservicemeetup.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.time.LocalDate;
+import javax.persistence.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Entity
+@Table
 public class Registration {
 
     @Id
-    @Column(name="registration_id")
+    @Column(name = "registration_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name= "person-name")
+    @Column(name = "person_name")
     private String name;
 
-    @Column(name= "date-of-registration")
+    @Column(name = "date_of_registration")
     private String dateOfRegistration;
 
     @Column
     private String registration;
+
 }

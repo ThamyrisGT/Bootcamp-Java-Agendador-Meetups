@@ -1,7 +1,7 @@
 package com.womkarescode.microservicemeetup.service;
 
 import com.womkarescode.microservicemeetup.exception.BusinessException;
-import com.womkarescode.microservicemeetup.model.Registration;
+import com.womkarescode.microservicemeetup.model.entity.Registration;
 import com.womkarescode.microservicemeetup.repository.RegistrationRepository;
 import org.springframework.data.domain.*;
 

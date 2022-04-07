@@ -1,6 +1,6 @@
 package com.womkarescode.microservicemeetup.service;
 
-import com.womkarescode.microservicemeetup.model.Registration;
+import com.womkarescode.microservicemeetup.model.entity.Registration;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

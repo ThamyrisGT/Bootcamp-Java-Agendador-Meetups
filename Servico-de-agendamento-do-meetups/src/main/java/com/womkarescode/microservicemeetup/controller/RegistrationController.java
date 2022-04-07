@@ -1,15 +1,20 @@
 package com.womkarescode.microservicemeetup.controller;
 
-import com.womkarescode.microservicemeetup.model.Registration;
+import com.womkarescode.microservicemeetup.model.entity.Registration;
 import com.womkarescode.microservicemeetup.model.RegistrationDTO;
 import com.womkarescode.microservicemeetup.service.RegistrationService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/registration")
@@ -62,6 +67,19 @@ public class RegistrationController {
             return modelMapper.map(registration, RegistrationDTO.class);
         }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+    }
+
+    @GetMapping
+    public Page<RegistrationDTO> find(RegistrationDTO registrationDTO , Pageable pageble){
+        Registration filter = modelMapper.map(registrationDTO,Registration.class);
+        Page<Registration> result = service.find(filter,pageble);
+
+        List<RegistrationDTO> list = result.getContent()
+                .stream()
+                .map(entity -> modelMapper.map(entity,RegistrationDTO.class))
+                .collect(Collectors.toList());
+
+        return new PageImpl<RegistrationDTO>(list,pageble,result.getTotalElements());
     }
 
 }

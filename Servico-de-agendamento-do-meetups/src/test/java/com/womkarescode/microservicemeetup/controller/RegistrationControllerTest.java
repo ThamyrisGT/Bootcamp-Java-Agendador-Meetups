@@ -1,7 +1,7 @@
 package com.womkarescode.microservicemeetup.controller;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import com.womkarescode.microservicemeetup.exception.BusinessException;
-import com.womkarescode.microservicemeetup.model.Registration;
+import com.womkarescode.microservicemeetup.model.entity.Registration;
 import com.womkarescode.microservicemeetup.model.RegistrationDTO;
 import com.womkarescode.microservicemeetup.service.RegistrationService;
 import org.hamcrest.Matchers;
@@ -270,7 +270,7 @@ public class RegistrationControllerTest {
 
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .put(REGISTRATION_API.concat(queryString))
+                .get(REGISTRATION_API.concat(queryString))
                 .accept(MediaType.APPLICATION_JSON);
 
         mockMvc
