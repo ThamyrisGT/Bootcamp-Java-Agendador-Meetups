@@ -1,7 +1,7 @@
-package com.womkarescode.microservicemeetup.controller;
+package com.womkarescode.microservicemeetup.controller.resource;
 
 import com.womkarescode.microservicemeetup.model.entity.Registration;
-import com.womkarescode.microservicemeetup.model.RegistrationDTO;
+import com.womkarescode.microservicemeetup.controller.dto.RegistrationDTO;
 import com.womkarescode.microservicemeetup.service.RegistrationService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

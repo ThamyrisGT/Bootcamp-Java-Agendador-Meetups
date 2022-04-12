@@ -3,6 +3,7 @@ package com.womkarescode.microservicemeetup.service;
 import com.womkarescode.microservicemeetup.exception.BusinessException;
 import com.womkarescode.microservicemeetup.model.entity.Registration;
 import com.womkarescode.microservicemeetup.repository.RegistrationRepository;
+import com.womkarescode.microservicemeetup.service.impl.RegistrationServiceImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

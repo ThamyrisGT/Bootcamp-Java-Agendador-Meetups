@@ -35,7 +35,8 @@ public class RegistrationRepositoryTest {
         String registration = "123";
 
         Registration registration_attribute = createNewRegistration(registration);
-        entityManager.persist(registration_attribute);
+        //entityManager.persist(registration_attribute);
+        repository.save(registration_attribute);
 
         boolean exists = repository.existsByRegistration(registration);
 
