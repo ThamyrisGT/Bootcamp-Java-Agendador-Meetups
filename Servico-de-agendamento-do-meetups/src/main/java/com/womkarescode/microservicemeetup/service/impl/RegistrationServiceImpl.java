@@ -5,9 +5,11 @@ import com.womkarescode.microservicemeetup.model.entity.Registration;
 import com.womkarescode.microservicemeetup.repository.RegistrationRepository;
 import com.womkarescode.microservicemeetup.service.RegistrationService;
 import org.springframework.data.domain.*;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Service
 public class RegistrationServiceImpl implements RegistrationService {
 
     RegistrationRepository registrationRepository;
