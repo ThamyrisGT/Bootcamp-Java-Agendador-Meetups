@@ -43,7 +43,7 @@ public class RegistrationServiceTest {
 
     @Test
     @DisplayName("Should have an registration")
-    public void testSaveStudent(){
+    public void testSaveRegistration(){
 
         Registration registration = createValidRegistration();
 
@@ -61,7 +61,7 @@ public class RegistrationServiceTest {
 
     @Test
     @DisplayName("Should throw Business Exception error when try to safe a new registration with a duplicated registration")
-    public void testShouldNotSafeAsRegistrationDuplicated(){
+    public void testShouldNotSaveARegistrationDuplicated(){
         Registration registration = createValidRegistration();
         Mockito.when(repository.existsByRegistration(Mockito.any())).thenReturn(true);
 
