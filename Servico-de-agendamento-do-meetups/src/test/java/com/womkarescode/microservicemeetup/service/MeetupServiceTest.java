@@ -1,34 +1,30 @@
 package com.womkarescode.microservicemeetup.service;
 
-import com.womkarescode.microservicemeetup.controller.dto.MeetupDTO;
-import com.womkarescode.microservicemeetup.exception.BusinessException;
+import com.womkarescode.microservicemeetup.model.entity.CreateMeetup;
 import com.womkarescode.microservicemeetup.model.entity.Meetup;
 import com.womkarescode.microservicemeetup.model.entity.Registration;
 import com.womkarescode.microservicemeetup.repository.MeetupRepository;
 import com.womkarescode.microservicemeetup.repository.RegistrationRepository;
 import com.womkarescode.microservicemeetup.service.impl.MeetupServiceImpl;
-import com.womkarescode.microservicemeetup.service.impl.RegistrationServiceImpl;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
 public class MeetupServiceTest {
-
-    RegistrationService registrationService;
 
     MeetupService meetupService;
 
@@ -40,65 +36,115 @@ public class MeetupServiceTest {
 
     @BeforeEach
     public void setUp(){
-        this.registrationService = new RegistrationServiceImpl(registrationRepository);
         this.meetupService = new MeetupServiceImpl(meetupRepository);
     }
 
     @Test
     @DisplayName("Should create a meetup")
     public void testSaveMeetup(){
-        Meetup meetup = createValidMeetup();
-        Registration registration = createValidRegistration();
-        Mockito.when(registrationRepository.existsByRegistration(Mockito.any())).thenReturn(true);
-        Mockito.when(meetupRepository.save(meetup)).thenReturn(createValidMeetup());
+        Meetup meetupSaved = createValidMeetup();
 
-        Meetup savedMeetup = meetupService.save(meetup);
+        when( meetupRepository.save(createValidMeetup()) ).thenReturn( meetupSaved );
 
-        assertThat(savedMeetup.getId()).isEqualTo(11L);
-        assertThat(savedMeetup.getRegistration()).isEqualTo(registration);
-        assertThat(savedMeetup.getEvent()).isEqualTo("WomakersCode - Palestra");
+        Meetup meetup = meetupService.save(meetupSaved);
+
+        assertThat(meetup.getId()).isEqualTo(meetupSaved.getId());
+        assertThat(meetup.getMeetupDateRegistration()).isEqualTo(meetupSaved.getMeetupDateRegistration());
+        assertThat(meetup.getRegistration()).isEqualTo(meetupSaved.getRegistration());
+        assertThat(meetup.getEventDetails()).isEqualTo(meetupSaved.getEventDetails());
 
     }
 
-    @DisplayName("should not save a new meetup when try to register a registration already registered on a meetup")
     @Test
-    public void testErrorOnCreateMeetup(){
-        Meetup meetup = createValidMeetup();
-
-        Mockito.when(registrationRepository.existsByRegistration(Mockito.any())).thenReturn(true);
-        Mockito.when(meetupRepository.save(meetup)).thenThrow(new BusinessException("Meetup already enrolled"));
-
-        Mockito.verify(meetupRepository,Mockito.never()).save(meetup);
-    }
-
-    @DisplayName("should not save a new meetup when try to register a registration nonexistent")
-    @Test
-    public void testErrorOnCreateMeetupWithInvalidRegistration(){
-        Meetup meetup = createValidMeetup();
-        Long id = 11L;
-        Mockito.when(registrationRepository.findById(id)).thenReturn(Optional.empty());
-        Optional<Registration> registration = registrationService.getRegistrationById(id);
-
-        assertThat(registration.isPresent()).isFalse();
-        Mockito.verify(meetupRepository,Mockito.never()).save(meetup);
-
-    }
-
-
-    private Registration createValidRegistration() {
-        return Registration.builder()
-                .id(101L)
+    @DisplayName("Should update schedule a meetup held by the user.")
+    public void updateMeetupTest(){
+        Registration registration = Registration.builder()
+                .id(11L)
                 .name("Thamyris")
-                .dateOfRegistration("01/04/2022")
-                .registration("001")
+                .email("thammy@gmail.com")
+                .password("1234")
+                .dateOfRegistration(LocalDate.now())
+                .registration("Thamyris")
                 .build();
+
+        CreateMeetup createMeetup = CreateMeetup.builder()
+                .id(11L)
+                .event("Palestra Microservice")
+                .linkMeetup("https://www.zoom.com/")
+                .eventDate(LocalDate.now())
+                .hostedBy("Thamyris")
+                .guestSpeaker("Anna Neri")
+                .build();
+
+        Meetup updatingMeetup = createValidMeetup();
+        updatingMeetup.setId(11l);
+
+        Meetup updatedMeetup = Meetup.builder()
+                .meetupDateRegistration(LocalDate.now())
+                .registration(registration)
+                .eventDetails(createMeetup)
+                .build();
+
+        when( meetupRepository.save(updatedMeetup) ).thenReturn( updatedMeetup );
+
+        Meetup meetup = meetupService.update(updatedMeetup);
+
+        assertThat(meetup.getId()).isEqualTo(updatedMeetup.getId());
+        assertThat(meetup.getMeetupDateRegistration()).isEqualTo(updatedMeetup.getMeetupDateRegistration());
+        assertThat(meetup.getRegistration()).isEqualTo(updatedMeetup.getRegistration());
+        assertThat(meetup.getEventDetails()).isEqualTo(updatedMeetup.getEventDetails());
     }
+
+    @Test
+    @DisplayName("Should return a meetup when searched by id")
+    public void getMeetupByIdTest(){
+
+        Long id = 1L;
+
+        Meetup meetup = createValidMeetup();
+
+        meetup.setId(id);
+
+        Mockito.when( meetupRepository.findById(id)).thenReturn(Optional.of(meetup));
+
+        Optional<Meetup> result = meetupService.getById(id);
+
+        assertThat(result.isPresent()).isTrue();
+        assertThat(result.get().getId()).isEqualTo(id);
+        assertThat(result.get().getMeetupDateRegistration()).isEqualTo(meetup.getMeetupDateRegistration());
+        assertThat(result.get().getRegistration()).isEqualTo(meetup.getRegistration());
+        assertThat(result.get().getEventDetails()).isEqualTo(meetup.getEventDetails());
+
+        verify( meetupRepository ).findById(id);
+
+    }
+
 
     private Meetup createValidMeetup(){
-        return Meetup.builder()
+        Meetup meetup = Meetup.builder().id(11l).build();
+        Registration registration = Registration.builder()
                 .id(11L)
-                .registration(createValidRegistration())
-                .event("WomakersCode - Palestra").build();
+                .name("Thamyris")
+                .email("thammy@gmail.com")
+                .password("1234")
+                .dateOfRegistration(LocalDate.now())
+                .registration("Thamyris")
+                .build();
+
+        CreateMeetup createMeetup = CreateMeetup.builder()
+                .id(11L)
+                .event("Palestra Microservice")
+                .linkMeetup("https://www.zoom.com/")
+                .eventDate(LocalDate.now())
+                .hostedBy("Thamyris")
+                .guestSpeaker("Anna Neri")
+                .build();
+
+        return Meetup.builder()
+                .meetupDateRegistration(LocalDate.now())
+                .registration(registration)
+                .eventDetails(createMeetup)
+                .build();
     }
 
 }

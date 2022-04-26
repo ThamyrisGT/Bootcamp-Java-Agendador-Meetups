@@ -1,7 +1,7 @@
 package com.womkarescode.microservicemeetup.service;
 
 
-import com.womkarescode.microservicemeetup.controller.dto.MeetupFilterDTO;
+import com.womkarescode.microservicemeetup.model.dto.MeetupFilterDTO;
 import com.womkarescode.microservicemeetup.model.entity.Meetup;
 import com.womkarescode.microservicemeetup.model.entity.Registration;
 import org.springframework.data.domain.Page;

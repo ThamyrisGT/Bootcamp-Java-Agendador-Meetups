@@ -1,4 +1,4 @@
-package com.womkarescode.microservicemeetup.controller.dto;
+package com.womkarescode.microservicemeetup.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

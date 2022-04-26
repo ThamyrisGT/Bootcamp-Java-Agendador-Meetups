@@ -63,4 +63,9 @@ public class RegistrationServiceImpl implements RegistrationService {
     public Optional<Registration> getRegistrationByRegistrationAttribute(String registrationAttribute) {
         return registrationRepository.findByRegistration(registrationAttribute);
     }
+
+    @Override
+    public Optional<Registration> getByRegistration(String registration) {
+        return registrationRepository.findByRegistration(registration);
+    }
 }

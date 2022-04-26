@@ -11,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -100,7 +101,7 @@ public class RegistrationRepositoryTest {
     private Registration createNewRegistration(String registration) {
         return Registration.builder()
                 .name("Thamyris")
-                .dateOfRegistration("10/10/2021")
+                .dateOfRegistration(LocalDate.now())
                 .registration(registration)
                 .build();
     }

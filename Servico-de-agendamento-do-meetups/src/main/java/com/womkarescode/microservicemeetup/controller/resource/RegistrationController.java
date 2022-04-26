@@ -1,7 +1,8 @@
 package com.womkarescode.microservicemeetup.controller.resource;
 
+import com.womkarescode.microservicemeetup.controller.data.RegistrationData;
+import com.womkarescode.microservicemeetup.model.dto.RegistrationDTO;
 import com.womkarescode.microservicemeetup.model.entity.Registration;
-import com.womkarescode.microservicemeetup.controller.dto.RegistrationDTO;
 import com.womkarescode.microservicemeetup.service.RegistrationService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +34,11 @@ public class RegistrationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RegistrationDTO create (@RequestBody @Valid RegistrationDTO registrationDTO){
+    public RegistrationDTO create (@RequestBody @Valid RegistrationData registrationData){
 
-        Registration entity = modelMapper.map(registrationDTO, Registration.class);
-        entity = service.save(entity);
-
-        return modelMapper.map(entity,RegistrationDTO.class);
+        Registration registration = modelMapper.map(registrationData, Registration.class);
+        registration = service.save(registration);
+        return modelMapper.map(registration, RegistrationDTO.class);
     }
 
     @GetMapping("{id}")
@@ -57,11 +57,11 @@ public class RegistrationController {
     }
 
     @PutMapping("{id}")
-    public RegistrationDTO update(@PathVariable Long id, RegistrationDTO registrationDTO) {
+    public RegistrationDTO update(@PathVariable Long id, RegistrationData registrationData) {
 
         return service.getRegistrationById(id).map(registration -> {
-            registration.setName(registrationDTO.getName());
-            registration.setDateOfRegistration(registrationDTO.getDateOfRegistration());
+            registration.setName(registrationData.getName());
+            registration.setEmail(registrationData.getEmail());
             registration = service.update(registration);
 
             return modelMapper.map(registration, RegistrationDTO.class);

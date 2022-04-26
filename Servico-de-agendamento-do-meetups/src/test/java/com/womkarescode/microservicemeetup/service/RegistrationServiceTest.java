@@ -21,6 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +55,7 @@ public class RegistrationServiceTest {
 
         assertThat(savedRegistration.getId()).isEqualTo(101L);
         assertThat(savedRegistration.getName()).isEqualTo("Thamyris");
-        assertThat(savedRegistration.getDateOfRegistration()).isEqualTo("01/04/2022");
+        assertThat(savedRegistration.getDateOfRegistration()).isEqualTo(LocalDate.now());
         assertThat(savedRegistration.getRegistration()).isEqualTo("001");
 
     }
@@ -173,7 +174,7 @@ public class RegistrationServiceTest {
         return Registration.builder()
                 .id(101L)
                 .name("Thamyris")
-                .dateOfRegistration("01/04/2022")
+                .dateOfRegistration(LocalDate.now())
                 .registration("001")
                 .build();
     }

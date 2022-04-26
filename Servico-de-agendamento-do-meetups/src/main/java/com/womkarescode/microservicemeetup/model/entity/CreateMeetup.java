@@ -10,36 +10,34 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 
+@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity
-@Table
-public class Registration {
+public class CreateMeetup {
 
     @Id
-    @Column(name = "registration_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "person_name")
-    private String name;
-
-    @Column(name = "person_email")
-    private String email;
-
-    @Column(name = "person_password")
-    private String password;
-
-    @Column(name = "date_of_registration")
-    @JsonFormat(pattern = "dd/MM/yyyy")
-    private LocalDate dateOfRegistration = LocalDate.now();
+    @Column
+    private String event;
 
     @Column
-    private String registration;
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate eventDate;
 
-    @OneToMany(mappedBy = "registration")
+    @Column
+    private String hostedBy;
+
+    @Column
+    private String guestSpeaker;
+
+    @Column
+    private String linkMeetup;
+
+    @OneToMany(mappedBy = "eventDetails")
     private List<Meetup> meetups;
 
 }

@@ -1,6 +1,6 @@
 package com.womkarescode.microservicemeetup.service.impl;
 
-import com.womkarescode.microservicemeetup.controller.dto.MeetupFilterDTO;
+import com.womkarescode.microservicemeetup.model.dto.MeetupFilterDTO;
 import com.womkarescode.microservicemeetup.model.entity.Meetup;
 import com.womkarescode.microservicemeetup.model.entity.Registration;
 import com.womkarescode.microservicemeetup.repository.MeetupRepository;

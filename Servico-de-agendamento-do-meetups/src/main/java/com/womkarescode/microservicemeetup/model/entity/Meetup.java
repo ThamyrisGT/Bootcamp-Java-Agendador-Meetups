@@ -1,11 +1,13 @@
 package com.womkarescode.microservicemeetup.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -26,7 +28,12 @@ public class Meetup {
     private Registration registration;
 
     @Column
-    private String meetupDate;
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate meetupDateRegistration = LocalDate.now();
+
+    @JoinColumn(name = "author_meetup")
+    @ManyToOne
+    private CreateMeetup eventDetails;
 
     @Column
     private Boolean registered;

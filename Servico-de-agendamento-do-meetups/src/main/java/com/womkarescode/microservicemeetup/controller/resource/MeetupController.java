@@ -1,10 +1,12 @@
 package com.womkarescode.microservicemeetup.controller.resource;
 
-import com.womkarescode.microservicemeetup.controller.dto.MeetupDTO;
-import com.womkarescode.microservicemeetup.controller.dto.MeetupFilterDTO;
-import com.womkarescode.microservicemeetup.controller.dto.RegistrationDTO;
+import com.womkarescode.microservicemeetup.model.dto.MeetupDTO;
+import com.womkarescode.microservicemeetup.model.dto.MeetupFilterDTO;
+import com.womkarescode.microservicemeetup.model.dto.RegistrationDTO;
+import com.womkarescode.microservicemeetup.model.entity.CreateMeetup;
 import com.womkarescode.microservicemeetup.model.entity.Meetup;
 import com.womkarescode.microservicemeetup.model.entity.Registration;
+import com.womkarescode.microservicemeetup.service.CreateMeetupService;
 import com.womkarescode.microservicemeetup.service.MeetupService;
 import com.womkarescode.microservicemeetup.service.RegistrationService;
 import lombok.RequiredArgsConstructor;
@@ -26,40 +28,45 @@ public class MeetupController {
 
     private final MeetupService meetupService;
     private final RegistrationService registrationService;
+    private final CreateMeetupService createMeetupService;
     private final ModelMapper modelMapper;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Long create(@RequestBody MeetupDTO meetupDTO){
-        Registration registration = registrationService.getRegistrationByRegistrationAttribute(meetupDTO.getRegistrationAttribute())
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.BAD_REQUEST));
+    public MeetupDTO createRegisterForEvent(@RequestBody MeetupFilterDTO filterDTO){
+        Registration registration = registrationService.getByRegistration(filterDTO.getRegistration())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
 
-        Meetup meetup =Meetup.builder()
+        CreateMeetup newEvent = createMeetupService.findByEvent(filterDTO.getEvent())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
+
+        Meetup entity = Meetup.builder()
+                .eventDetails(newEvent)
                 .registration(registration)
-                .event(meetupDTO.getEvent())
-                .meetupDate("10/10/2021")
                 .build();
-        meetup = meetupService.save(meetup);
-        return meetup.getId();
+
+        entity = meetupService.save(entity);
+        MeetupDTO dto = modelMapper.map(entity, MeetupDTO.class);
+        return dto;
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<MeetupDTO> findAll(MeetupFilterDTO meetupFilterDTO, Pageable pageRequest){
         Page<Meetup> result = meetupService.findAll(meetupFilterDTO, pageRequest);
-
         List<MeetupDTO> meetups = result
                 .getContent()
                 .stream()
-                .map(e ->{
-                    Registration registration = e.getRegistration();
-                    RegistrationDTO registrationDTO = modelMapper.map(registration,RegistrationDTO.class);
+                .map(entity -> {
 
-                    MeetupDTO meetupDTO =modelMapper.map(e,MeetupDTO.class);
+                    Registration registration = entity.getRegistration();
+                    RegistrationDTO registrationDTO = modelMapper.map(registration, RegistrationDTO.class);
+
+                    MeetupDTO meetupDTO = modelMapper.map(entity, MeetupDTO.class);
                     meetupDTO.setRegistration(registrationDTO);
                     return meetupDTO;
-                }).collect(Collectors.toList());
 
-        return new PageImpl<MeetupDTO>(meetups,pageRequest,result.getTotalElements());
+                }).collect(Collectors.toList());
+        return new PageImpl<MeetupDTO>(meetups, pageRequest, result.getTotalElements());
     }
 }

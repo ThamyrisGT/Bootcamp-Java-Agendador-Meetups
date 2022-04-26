@@ -1,9 +1,9 @@
 package com.womkarescode.microservicemeetup.controller;
 import com.womkarescode.microservicemeetup.controller.resource.RegistrationController;
+import com.womkarescode.microservicemeetup.model.entity.Registration;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import com.womkarescode.microservicemeetup.exception.BusinessException;
-import com.womkarescode.microservicemeetup.model.entity.Registration;
-import com.womkarescode.microservicemeetup.controller.dto.RegistrationDTO;
+import com.womkarescode.microservicemeetup.model.dto.RegistrationDTO;
 import com.womkarescode.microservicemeetup.service.RegistrationService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +26,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 
-
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -54,7 +54,11 @@ public class RegistrationControllerTest {
 
         RegistrationDTO registrationDTOBuilder = createNewRegistration();
         Registration savedRegistration  = Registration.builder().id(101L)
-                .name("Thamyris").dateOfRegistration("10/10/2021").registration("001").build();
+                .name("Thamyris")
+                .email("thammy@gmail.com")
+                .password("1234")
+                .dateOfRegistration(LocalDate.now())
+                .registration("001").build();
 
         // simula camada do usuário, da parte da execução
         BDDMockito.given(registrationService.save(any(Registration.class))).willReturn(savedRegistration);
@@ -74,7 +78,9 @@ public class RegistrationControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").value(101L))
                 .andExpect(jsonPath("name").value(registrationDTOBuilder.getName()))
-                .andExpect(jsonPath("dateOfRegistration").value(registrationDTOBuilder.getDateOfRegistration()))
+                .andExpect( jsonPath("email").value(registrationDTOBuilder.getEmail()))
+                .andExpect( jsonPath("password").value(registrationDTOBuilder.getPassword()))
+                //.andExpect(jsonPath("dateOfRegistration").value(registrationDTOBuilder.getDateOfRegistration()))
                 .andExpect(jsonPath("registration").value(registrationDTOBuilder.getRegistration()));
     }
 
@@ -101,6 +107,8 @@ public class RegistrationControllerTest {
         Registration registration = Registration.builder()
                 .id(createNewRegistration().getId())
                 .name(createNewRegistration().getName())
+                .email(createNewRegistration().getEmail())
+                .password(createNewRegistration().getPassword())
                 .dateOfRegistration(createNewRegistration().getDateOfRegistration())
                 .registration(createNewRegistration().getRegistration())
                 .build();
@@ -115,7 +123,9 @@ public class RegistrationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").value(101L))
                 .andExpect(jsonPath("name").value(createNewRegistration().getName()))
-                .andExpect(jsonPath("dateOfRegistration").value(createNewRegistration().getDateOfRegistration()))
+                .andExpect( jsonPath("email").value(createNewRegistration().getEmail()))
+                .andExpect( jsonPath("password").value(createNewRegistration().getPassword()))
+                //.andExpect(jsonPath("dateOfRegistration").value(createNewRegistration().getDateOfRegistration()))
                 .andExpect(jsonPath("registration").value(createNewRegistration().getRegistration()));
     }
 
@@ -198,7 +208,7 @@ public class RegistrationControllerTest {
                 Registration.builder()
                         .id(id)
                         .name("Thamyris")
-                        .dateOfRegistration("10/10/2021")
+                        .dateOfRegistration(LocalDate.now())
                         .registration("001")
                         .build();
 
@@ -209,7 +219,9 @@ public class RegistrationControllerTest {
                 Registration.builder()
                         .id(id)
                         .name("Thamyris")
-                        .dateOfRegistration("10/10/2021")
+                        .email("thammy@gmail.com")
+                        .password("1234")
+                        .dateOfRegistration(LocalDate.now())
                         .registration("001")
                         .build();
 
@@ -227,7 +239,9 @@ public class RegistrationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").value(id))
                 .andExpect(jsonPath("name").value(createNewRegistration().getName()))
-                .andExpect(jsonPath("dateOfRegistration").value(createNewRegistration().getDateOfRegistration()))
+                .andExpect(jsonPath("email").value(createNewRegistration().getEmail()))
+                .andExpect(jsonPath("password").value(createNewRegistration().getPassword()))
+                //.andExpect(jsonPath("dateOfRegistration").value(createNewRegistration().getDateOfRegistration()))
                 .andExpect(jsonPath("registration").value("001"));
     }
 
@@ -253,41 +267,44 @@ public class RegistrationControllerTest {
     @DisplayName("Should filter registration")
     public void testFindRegistration() throws Exception {
 
-        Long id = 11L;
-
         Registration registration = Registration.builder()
-                .id(id)
-                .name(createNewRegistration().getName())
-                .dateOfRegistration(createNewRegistration().getDateOfRegistration())
-                .registration(createNewRegistration().getRegistration()).build();
+                .id(101l)
+                .name("Thamyris")
+                .email("thammy@gmail.com")
+                .password("1234")
+                .dateOfRegistration(LocalDate.now())
+                .registration("001")
+                .build();
 
-        BDDMockito.given(registrationService.find(Mockito.any(Registration.class), Mockito.any(Pageable.class)))
-                .willReturn(new PageImpl<Registration>(Arrays.asList(registration),
-                        PageRequest.of(0,100), 1));
+        BDDMockito.given( registrationService.find(Mockito.any(Registration.class),
+                        Mockito.any(Pageable.class)))
+                .willReturn( new PageImpl<Registration>( Arrays.asList(registration),
+                        PageRequest.of(0,100), 1 ));
 
+        String queryString = String.format("?name=%s&email=%s&page=0&size=100",
+                registration.getName(), registration.getEmail());
 
-        String queryString = String.format("?name=%s&dateOfRegistration=%s&page=0&size=100",
-                registration.getRegistration(), registration.getDateOfRegistration());
-
-
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .get(REGISTRATION_API.concat(queryString))
                 .accept(MediaType.APPLICATION_JSON);
 
         mockMvc
-                .perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("content", Matchers.hasSize(1)))
-                .andExpect(jsonPath("totalElements"). value(1))
-                .andExpect(jsonPath("pageable.pageSize"). value(100))
-                .andExpect(jsonPath("pageable.pageNumber"). value(0));
+                .perform( request )
+                .andExpect( status().isOk() )
+                .andExpect( jsonPath("content", Matchers.hasSize(1)))
+                .andExpect( jsonPath("totalElements").value(1))
+                .andExpect( jsonPath("pageable.pageSize").value(100))
+                .andExpect( jsonPath("pageable.pageNumber").value(0));
 
     }
 
     private RegistrationDTO createNewRegistration() {
         return  RegistrationDTO.builder()
-                .id(101l).name("Thamyris")
-                .dateOfRegistration("10/10/2021")
+                .id(101l)
+                .name("Thamyris")
+                .email("thammy@gmail.com")
+                .password("1234")
+                .dateOfRegistration(LocalDate.now())
                 .registration("001")
                 .build();
     }
