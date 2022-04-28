@@ -1,4 +1,4 @@
-package com.womkarescode.microservicemeetup.controller.data;
+package com.womkarescode.microservicemeetup.controller.form;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import javax.validation.constraints.NotEmpty;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RegistrationData {
+public class RegistrationForm {
 
     @NotEmpty
     private String name;

@@ -1,6 +1,6 @@
 package com.womkarescode.microservicemeetup.controller.resource;
 
-import com.womkarescode.microservicemeetup.controller.data.RegistrationData;
+import com.womkarescode.microservicemeetup.controller.form.RegistrationForm;
 import com.womkarescode.microservicemeetup.model.dto.RegistrationDTO;
 import com.womkarescode.microservicemeetup.model.entity.Registration;
 import com.womkarescode.microservicemeetup.service.RegistrationService;
@@ -34,9 +34,9 @@ public class RegistrationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RegistrationDTO create (@RequestBody @Valid RegistrationData registrationData){
+    public RegistrationDTO create (@RequestBody @Valid RegistrationForm registrationForm){
 
-        Registration registration = modelMapper.map(registrationData, Registration.class);
+        Registration registration = modelMapper.map(registrationForm, Registration.class);
         registration = service.save(registration);
         return modelMapper.map(registration, RegistrationDTO.class);
     }
@@ -57,11 +57,11 @@ public class RegistrationController {
     }
 
     @PutMapping("{id}")
-    public RegistrationDTO update(@PathVariable Long id, RegistrationData registrationData) {
+    public RegistrationDTO update(@PathVariable Long id, RegistrationForm registrationForm) {
 
         return service.getRegistrationById(id).map(registration -> {
-            registration.setName(registrationData.getName());
-            registration.setEmail(registrationData.getEmail());
+            registration.setName(registrationForm.getName());
+            registration.setEmail(registrationForm.getEmail());
             registration = service.update(registration);
 
             return modelMapper.map(registration, RegistrationDTO.class);

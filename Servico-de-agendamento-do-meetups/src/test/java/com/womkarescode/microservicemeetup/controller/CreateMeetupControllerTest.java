@@ -86,13 +86,61 @@ public class CreateMeetupControllerTest {
     }
 
     @Test
-    @DisplayName("Shouldn't create Registration with registration duplicated")
+    @DisplayName("Should return Event Created")
+    public void testGetEventMeetup() throws Exception{
+
+        Long id = 1L;
+
+        CreateMeetupDTO dto = newEventMeetupDTO();
+
+        CreateMeetup event = CreateMeetup.builder().id(1L)
+                .id(1L)
+                .event("Palestra - Microservice")
+                .linkMeetup("https://www.zoom.com/")
+                .eventDate(LocalDate.now())
+                .hostedBy("Thamyris")
+                .guestSpeaker("Anna Neri")
+                .build();
+
+
+        BDDMockito.given( service.getEventById(id)).willReturn(Optional.of(event));
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(MEETUP_API.concat("/" + id))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc
+                .perform(request)
+                .andExpect(status().isOk())
+                .andExpect( jsonPath("id").value(1l))
+                .andExpect( jsonPath("event").value(dto.getEvent()))
+                .andExpect( jsonPath("linkMeetup").value(dto.getLinkMeetup()))
+                .andExpect( jsonPath("guestSpeaker").value(dto.getGuestSpeaker()))
+                .andExpect( jsonPath("hostedBy").value(dto.getHostedBy()));
+    }
+
+    @Test
+    @DisplayName("Should return NOT FOUND when the event doesn't exists")
+    public void testEventNotFound() throws Exception {
+
+        BDDMockito.given(service.getEventById(anyLong())).willReturn(Optional.empty());
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get(MEETUP_API.concat("/" + 1))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Shouldn't create event with event duplicated")
     public void testCreateEventMeetupWithRegistrationDuplicated() throws Exception {
 
         CreateMeetupDTO dto = newEventMeetupDTO();
         String json = new ObjectMapper().writeValueAsString(dto);
         BDDMockito.given(service.saveNewEventMeetup(Mockito.any(CreateMeetup.class)))
-                .willThrow(new BusinessException("Registration already registered"));
+                .willThrow(new BusinessException("Event already registered"));
 
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .post(MEETUP_API)
@@ -103,7 +151,7 @@ public class CreateMeetupControllerTest {
         mockMvc.perform( request )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("errors", Matchers.hasSize(1)))
-                .andExpect(jsonPath("errors[0]").value("Registration already registered"));
+                .andExpect(jsonPath("errors[0]").value("Event already registered"));
 
     }
 

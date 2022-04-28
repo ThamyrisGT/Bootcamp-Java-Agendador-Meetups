@@ -35,6 +35,4 @@ public class Meetup {
     @ManyToOne
     private CreateMeetup eventDetails;
 
-    @Column
-    private Boolean registered;
 }

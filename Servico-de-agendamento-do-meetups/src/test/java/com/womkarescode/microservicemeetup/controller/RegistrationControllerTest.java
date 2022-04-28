@@ -100,7 +100,7 @@ public class RegistrationControllerTest {
     }
 
     @Test
-    @DisplayName("Should get registration information")
+    @DisplayName("Should get registration")
     public void testGetRegistration() throws  Exception{
         Long id = 101L;
 

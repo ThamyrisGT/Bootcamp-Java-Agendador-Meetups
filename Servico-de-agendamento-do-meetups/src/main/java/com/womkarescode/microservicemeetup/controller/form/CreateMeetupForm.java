@@ -1,4 +1,4 @@
-package com.womkarescode.microservicemeetup.controller.data;
+package com.womkarescode.microservicemeetup.controller.form;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CreateMeetupData {
+public class CreateMeetupForm {
 
     @NotEmpty
     private String event;

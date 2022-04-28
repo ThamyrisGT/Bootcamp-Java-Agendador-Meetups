@@ -98,7 +98,6 @@ public class MeetupServiceTest {
     @Test
     @DisplayName("Should return a meetup when searched by id")
     public void testGetMeetupById(){
-
         Long id = 1L;
 
         Meetup meetup = createValidMeetup();
@@ -118,7 +117,6 @@ public class MeetupServiceTest {
         verify( meetupRepository ).findById(id);
 
     }
-
 
     private Meetup createValidMeetup(){
         Meetup meetup = Meetup.builder().id(11l).build();
