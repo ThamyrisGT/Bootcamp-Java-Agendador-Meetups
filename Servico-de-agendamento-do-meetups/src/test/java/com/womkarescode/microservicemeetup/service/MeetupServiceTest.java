@@ -57,7 +57,7 @@ public class MeetupServiceTest {
 
     @Test
     @DisplayName("Should update schedule a meetup held by the user.")
-    public void updateMeetupTest(){
+    public void testUpdateMeetup(){
         Registration registration = Registration.builder()
                 .id(11L)
                 .name("Thamyris")
@@ -97,7 +97,7 @@ public class MeetupServiceTest {
 
     @Test
     @DisplayName("Should return a meetup when searched by id")
-    public void getMeetupByIdTest(){
+    public void testGetMeetupById(){
 
         Long id = 1L;
 
