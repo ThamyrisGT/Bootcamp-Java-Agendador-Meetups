@@ -39,6 +39,16 @@ public class CreateMeetupRepositoryTest {
 
         assertThat(foundEvent.isPresent()).isTrue();
     }
+    @Test
+    @DisplayName("Should return event by event name")
+    public void testFindyByEvent(){
+        CreateMeetup eventMeetup = createNewEvent("Palestra - Microservice");
+        entityManager.persist(eventMeetup);
+
+        Optional<CreateMeetup> foundEvent = repository.findByEvent(eventMeetup.getEvent());
+
+        assertThat(foundEvent.isPresent()).isTrue();
+    }
 
     @Test
     @DisplayName("Should save event")
@@ -49,6 +59,20 @@ public class CreateMeetupRepositoryTest {
         CreateMeetup savedRegistration = repository.save(newEvent);
 
         assertThat(savedRegistration.getId()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Should update event by id")
+    public void testUpdateEventById(){
+
+        CreateMeetup eventMeetup = createNewEvent("Palestra - Microservice");
+        entityManager.persist(eventMeetup);
+
+        Optional<CreateMeetup> foundEvent = repository.findById(eventMeetup.getId());
+        CreateMeetup savedRegistration = repository.save(eventMeetup);
+
+        assertThat(savedRegistration.getId()).isNotNull();
+        assertThat(foundEvent.isPresent()).isTrue();
     }
 
     @Test
@@ -71,6 +95,26 @@ public class CreateMeetupRepositoryTest {
         assertThat(deleteRegistration).isNull();
         assertThat(deletedMeetup).isNull();
     }
+
+    @Test
+    @DisplayName("Should return false when doesn't exists Event by id")
+    public void testReturnFalseWhenEventDoesntExistsById(){
+        Long id = 11L;
+
+        boolean exists = repository.existsById(id);
+
+        assertThat(exists).isFalse();
+    }
+    @Test
+    @DisplayName("Shouldn't return event when doesn't exists Event by event name")
+    public void testReturnFalseWhenEventDoesntExistsByEventName(){
+        String eventName = "Palestra - Microservice";
+
+        Optional<CreateMeetup> nonCreateMeetup = repository.findByEvent(eventName);
+
+        assertThat(nonCreateMeetup.isPresent()).isFalse();
+    }
+
 
     public static CreateMeetup createNewEvent(String event) {
         return CreateMeetup.builder()
